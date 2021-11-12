@@ -1,12 +1,7 @@
 import { curry, sum, spiral, semverSort } from "./index";
 
-const getSum = (
-  a: number,
-  b: number,
-  c: number,
-  d: number,
-  e: number
-): number => a + b + c + d + e;
+const getSum = (a: number, b: number, c: number, d: number, e: number): any =>
+  a + b + c + d + e;
 
 const hof = curry(getSum);
 describe("curry", () => {

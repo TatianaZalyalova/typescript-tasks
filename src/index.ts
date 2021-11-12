@@ -1,3 +1,19 @@
+type PartialArgs<T extends (...args: number[]) => number> = T extends (
+  ...args: infer TArgs
+) => number
+  ? Partial<TArgs>
+  : never;
+
+type Curried<T extends (...args: any) => any, TReturn = ReturnType<T>> = <
+  TArgs extends PartialArgs<T>,
+  TRest extends number[]
+>(
+  ...args: TArgs
+) => TRest extends [] ? TReturn : Curried<(...args2: number[]) => TReturn>;
+export function curry<TFunc extends (...args: number[]) => number>(
+  func: TFunc
+): Curried<TFunc>;
+
 export function curry(func: () => number) {
   return function curried(this: any, ...args: any) {
     if (args.length >= func.length) {
@@ -8,7 +24,12 @@ export function curry(func: () => number) {
   };
 }
 
-export function sum(a: number = 0) {
+interface ISum {
+  (b: number): ISum;
+  toString: () => number;
+}
+
+export function sum(a: number = 0): ISum {
   let currentSum = a;
   function f(b: number) {
     currentSum += b;
@@ -20,22 +41,7 @@ export function sum(a: number = 0) {
   return f;
 }
 
-/*alert( sum(1)(2) ); // 3
-  alert( sum(5)(-1)(2) ); // 6
-  alert( sum(6)(-1)(-2)(-3) ); // 0
-  alert( sum(0)(1)(2)(3)(4)(5) ); // 15*/
-
-/*const s = sum();
-alert(s(1)); // 1
-alert(s(1)(2)); //3
-alert(s(3)(4)(5)); // 12
-
-const s3 = sum(3);
-
-alert(s3(5)); // 8
-alert(s3(6)); // 9*/
-
-export function spiral(arr: number[][]) {
+export function spiral(arr: number[][]): number[] {
   let concatArr: number[] = [];
   while (arr.length !== 0) {
     concatArr = concatArr.concat(arr.shift() as number[]);
@@ -71,29 +77,3 @@ export function semverSort(arr: string[]): string[] {
   const arrVersionSort = arrVersion.sort(compareNumeric);
   return arrVersionSort.map((item) => item.join("."));
 }
-
-/*class Parallel  {
-  constructor(a:number) {
-
-  }
-
-  jobs(...funcs:any[]) {
-    const arrStreams:[] = []
-    for(let i = 0; i < funcs.length; i++) {
-      funcs[i]().then(function(result:number){
-        arrStreams.push(result);
-      });
-    }
-    return arrStreams;
-  }
-}
-const runner = new Parallel(2);
-
-console.log(runner
-  .jobs(
-    () => new Promise((resolve) => setTimeout(resolve, 10, 1)),
-    () => new Promise((resolve) => setTimeout(resolve, 50, 2)),
-    () => new Promise((resolve) => setTimeout(resolve, 20, 3)),
-    () => new Promise((resolve) => setTimeout(resolve, 90, 4)),
-    () => new Promise((resolve) => setTimeout(resolve, 30, 5)),
-  )) // [1, 3, 2, 4, 5];*/
